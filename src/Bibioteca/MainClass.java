@@ -1,12 +1,10 @@
 package Bibioteca;
 
-import Interface.VnCarrera;
-import Interface.VnEstudiante;
-import Interface.VnInicio;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import Interface.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 import java.util.*;
-import javax.swing.WindowConstants;
 
 public class MainClass {
 

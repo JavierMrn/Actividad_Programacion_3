@@ -8,6 +8,7 @@ public class Estudiante {
     private String genero;
     private String cedula;
     private ArrayList<Prestamo> registroPrestamos = new ArrayList<>();
+    private ArrayList<Prestamo> registroEntregas = new ArrayList<>();
 
     //Constructores
     public Estudiante() {
@@ -15,6 +16,7 @@ public class Estudiante {
         this.genero = "";
         this.cedula = "";
         registroPrestamos.clear();
+        registroEntregas.clear();
     }
 
     public Estudiante(String nombre, String genero, String cedula) {
@@ -22,6 +24,7 @@ public class Estudiante {
         this.genero = genero;
         this.cedula = cedula;
         registroPrestamos.clear();
+        registroEntregas.clear();
     }
 
     //Verificar número de cédula
@@ -55,7 +58,7 @@ public class Estudiante {
             cedulaCorrecta = false;
         }
         if (!cedulaCorrecta) {
-            System.out.println("La Cédula ingresada es Incorrecta");
+            System.out.println("La cédula ingresada es incorrecta...");
         }
         return cedulaCorrecta;
     }
@@ -65,16 +68,32 @@ public class Estudiante {
         registroPrestamos.add(a);
     }
 
+    public void addEntrega(Prestamo a, int index) {
+        registroEntregas.add(a);
+        registroPrestamos.remove(index);
+    }
+
     //Metodo que consulta los prestamos
     public boolean isResponsable() {
+        boolean responsable = true;
 
-        return !registroPrestamos.isEmpty();
+        if (registroPrestamos.isEmpty()) {
+            return false;
+        }
+
+        for (int i = (registroPrestamos.size() - 1); i > (registroPrestamos.size() - 4); i++) {
+            if (registroPrestamos.get(i).isAtrasado()) {
+                responsable = false;
+            }
+        }
+
+        return responsable;
     }
-    
-    public void mostrarInfo(){
-        System.out.println("Nombre del Estudiante: " + nombre);
-        System.out.println("Genero del Estudiante: " + genero);
-        System.out.println("Materiales prestados: " + registroPrestamos.size());
+
+    public void mostrarInfo() {
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Genero: " + genero);
+        System.out.println("No.Cedula: " + cedula);
     }
 
     //Metodos getters and setters
@@ -104,5 +123,9 @@ public class Estudiante {
 
     public ArrayList<Prestamo> getRegistroPrestamos() {
         return registroPrestamos;
+    }
+
+    public ArrayList<Prestamo> getRegistroEntregas() {
+        return registroEntregas;
     }
 }

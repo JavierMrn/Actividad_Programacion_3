@@ -8,8 +8,14 @@ public class Menu {
     private ArrayList<Carrera> carreras = new ArrayList<>();
     private String seleccion;
     private Prestamo auxPrestamo = new Prestamo();
+    private int auxint;
     private Estudiante auxEstudiante = new Estudiante();
     private Carrera auxCarrera = new Carrera();
+    private Date fecha;
+    private int diasMes = 30;
+    private int maxDias = 25;
+    private int dia, mes, anio;
+    boolean bandera;
 
     public static String marco = "--------------------------------------------------------";
     Scanner sc = new Scanner(System.in);
@@ -22,6 +28,7 @@ public class Menu {
     public Menu() {
     }
 
+    //Metodos
     public void activarMenu() {
         this.opciones();
     }
@@ -30,7 +37,7 @@ public class Menu {
         System.out.println("Seleccione una opción:");
         System.out.println("    1. Añadir nuevo estudiante.");
         System.out.println("    2. Añadir nueva carrera.");
-        System.out.println("    3. Crear nuevo pretamo.");
+        System.out.println("    3. Opciones Pretamo.");
         System.out.println("    4. Reportes por estudiante.");
         System.out.println("    5. Salir.");
         System.out.println(marco);
@@ -63,22 +70,20 @@ public class Menu {
     }
 
     private void opcionNuevoEstudiante() {
+
+        if (carreras.isEmpty()) {
+            System.out.println("Noy hay carreras registradas...");
+            System.out.println(marco);
+            System.out.println("Creando Nueva Carrera: ");
+            this.opcionNuevaCarrera();
+        }
+
         auxEstudiante = new Estudiante();
         String cedula = "", nombre, genero;
 
         this.verificarCarrera();
-        System.out.println(marco);
 
-        System.out.print("Ingrese el número de cedula del estudiante: ");
-        sc.nextLine();
-        cedula = sc.nextLine();
-
-        while (!auxEstudiante.verificarCedula(cedula)) {
-            System.out.println(marco);
-            System.out.print("Ingrese un número valido: ");
-            cedula = sc.nextLine();
-        }
-
+        cedula = this.verificarCedula();
         auxEstudiante.setCedula(cedula);
         System.out.print("Ingrese el nombre del estudiante: ");
         nombre = sc.nextLine();
@@ -116,12 +121,23 @@ public class Menu {
     }
 
     private void opcionNuevaCarrera() {
+        String nombreCarrera, nombreDirector;
+        int duracion;
 
         System.out.print("Ingrese el nombre de la carrera: ");
-        String nombreCarrera = sc.nextLine();
+        nombreCarrera = sc.nextLine();
         System.out.print("Ingrese el nombre del director: ");
-        String nombreDirector = sc.nextLine();
-        int duracion = this.verificarEnteros("Ingrese el número de semestres: ", "Ingrese un número valido...");
+        nombreDirector = sc.nextLine();
+
+        do {
+            duracion = this.verificarEnteros("Ingrese el número de semestres: ", "Ingrese un número valido...");
+            if (duracion >= 5 && duracion <= 12) {
+                bandera = false;
+            } else {
+                System.out.println("Ingrese un número valido...");
+                bandera = true;
+            }
+        } while (bandera);
 
         System.out.println("");
         sc.nextLine();
@@ -150,7 +166,7 @@ public class Menu {
     }
 
     private void opcionPrestamo() {
-        this.funcionesVarias("  1. Registrar Nuevo Prestamo | 2. Entrega de Materiales");
+        this.funcionesVarias("  1. Registrar Nuevo Prestamo | 2. Entrega de Material");
 
         this.verificarCarrera();
         this.verificarEstudiante();
@@ -166,6 +182,7 @@ public class Menu {
                 switch (seleccion) {
                     case "1":
                         System.out.println("Tipo de material a prestar: ");
+                        System.out.println("");
                         this.funcionesVarias("  1. Libro | 2. Audiovisual");
                         switch (seleccion) {
                             case "1":
@@ -187,6 +204,7 @@ public class Menu {
                 switch (seleccion) {
                     case "1":
                         System.out.println("Tipo de material a entregar: ");
+                        System.out.println("");
                         this.funcionesVarias("  1. Libro | 2. Audiovisual");
                         switch (seleccion) {
                             case "1":
@@ -204,15 +222,44 @@ public class Menu {
         }
     }
 
-    private void opcionNP_Libro() {
-        String titulo, area, idioma, fechaRealizacion;
+    private void opcionNuevoPrestamo() {
+        String titulo, area, idioma;
+        int codigo = 0;
+        int duracion;
+
+        if (seleccion.equals("1")) {
+            System.out.println("Nuevo Prestamo - Libro");
+            System.out.println("");
+            codigo = this.verificarEnteros("Ingrese el código del libro (Ej. 123): ", "Ingrese un código valido...");
+
+            System.out.print("Titulo del libro: ");
+            sc.nextLine();
+            titulo = sc.nextLine();
+            System.out.print("Area del libro: ");
+            area = sc.nextLine();
+            System.out.print("Idioma del libro: ");
+            idioma = sc.nextLine();
+        } else {
+            System.out.println("Nuevo Prestamo - Audiovisual");
+
+            System.out.print("Título del audiovisual: ");
+            titulo = sc.nextLine();
+            codigo = this.verificarEnteros("Código del audiovisual: ", "Ingrese un código valido...");
+            duracion = this.verificarEnteros("Duración del audiovisual: ", "Ingrese una duración valida...");
+        }
+        
+        System.out.println("");
+        this.funcionesVarias("  1. Guardar | 2. Reintentar");
+    }
+
+    public void opcionNP_Libro() {
+        String titulo, area, idioma;
         int codigo = 0;
 
         System.out.println("Nuevo Prestamo - Libro");
+
         System.out.println("");
-        System.out.print("Fecha realización (23-03-2020): ");
-        fechaRealizacion = sc.nextLine();
-        codigo = this.verificarEnteros("Ingrese el código del libro: ", "Ingrese un código valido...");
+        codigo = this.verificarEnteros("Ingrese el código del libro (Ej. 123): ", "Ingrese un código valido...");
 
         System.out.print("Titulo del libro: ");
         sc.nextLine();
@@ -228,12 +275,8 @@ public class Menu {
         switch (seleccion) {
             case "1":
                 Libro libro = new Libro(codigo, titulo, area, idioma);
-                this.auxPrestamo = new Prestamo(fechaRealizacion, libro);
-                auxEstudiante.addPrestamo(auxPrestamo);
-                System.out.println("             Guardado Exitosamente              ");
-                System.out.println(marco);
-
-                this.funcionesVarias("  1. Nuevo Prestamo | 2. Salir");
+                this.establecerDatos(libro, null);
+                this.informacionTiket(libro, null);
                 switch (seleccion) {
                     case "1":
                         this.opcionPrestamo();
@@ -249,14 +292,12 @@ public class Menu {
         }
     }
 
-    private void opcionNP_AudioVisual() {
-        String titulo, fechaRealizacion;
+    public void opcionNP_AudioVisual() {
+        String titulo;
         int codigo, duracion;
 
         System.out.println("Nuevo Prestamo - Audiovisual");
-        System.out.println("");
-        System.out.print("Fecha realización (23-03-2020): ");
-        fechaRealizacion = sc.nextLine();
+
         System.out.print("Título del audiovisual: ");
         titulo = sc.nextLine();
         codigo = this.verificarEnteros("Código del audiovisual: ", "Ingrese un código valido...");
@@ -269,10 +310,8 @@ public class Menu {
         switch (seleccion) {
             case "1":
                 AudioVisual audioVisual = new AudioVisual(codigo, titulo, duracion);
-                auxPrestamo = new Prestamo(fechaRealizacion, audioVisual);
-                auxEstudiante.addPrestamo(auxPrestamo);
-
-                this.funcionesVarias("  1. Nuevo Prestamo | 2. Salir");
+                this.establecerDatos(null, audioVisual);
+                this.informacionTiket(null, audioVisual);
                 switch (seleccion) {
                     case "1":
                         this.opcionPrestamo();
@@ -288,32 +327,58 @@ public class Menu {
         }
     }
 
-    private void opcionDP_Libro() {
-        String fechaDevolucion;
-        int codigo = this.verificarEnteros("Ingrese el código del libro: ", "Ingrese un código valido...");
+    public void opcionDP_Libro() {
+        fecha = new Date();
 
-        for (Prestamo per : auxEstudiante.getRegistroPrestamos()) {
-            if (per.getMaVisual() == null) {
-                if (per.getLibro().getCodigo() == codigo) {
-                    auxPrestamo = per;
-                    break;
-                }
-            }
+        this.verificarMaterial("libro");
+
+        if (auxPrestamo.isEntregado()) {
+            System.out.println("Material entregado... ");
+            System.out.println(marco);
         }
 
         System.out.println("Datos del Material: ");
+        System.out.println(marco);
         auxPrestamo.getLibro().imprimirInfo();
 
-        System.out.print("Fecha Devolucion (23-03-2020): ");
-        fechaDevolucion = sc.nextLine();
+        System.out.println("");
+        sc.nextLine();
 
-        this.funcionesVarias("  1. Guardar | 2. Reintentar");
+        if (auxPrestamo.isEntregado()) {
+            auxPrestamo.imprimirInfo();
+            System.out.println("");
+            this.funcionesVarias("  1. Reintentar Código | 2. Opciones Prestamo");
+            switch (seleccion) {
+                case "1":
+                    this.opcionDP_Libro();
+                    break;
+                case "2":
+                    this.opcionPrestamo();
+                    break;
+            }
+        }
+
+        this.funcionesVarias("  1. Aceptar | 2. Reintentar");
 
         switch (seleccion) {
             case "1":
-                auxPrestamo.setFechaDevolucion(fechaDevolucion);
-                System.out.println("Fecha: " + auxPrestamo.getFechaRealizacion());
-                this.funcionesVarias("  1. Guardar | 2. Reintentar");
+                System.out.println("Ingrese fecha de entrega: ");
+                do {
+                    bandera = true;
+                    fecha = this.llenarFecha();
+                    System.out.println("");
+                    sc.nextLine();
+                    this.funcionesVarias("  1. Aceptar | 2. Reintentar");
+                    if ("1".equals(seleccion)) {
+                        bandera = false;
+                    }
+
+                } while (bandera);
+
+                auxPrestamo.devolverMaterial(fecha);
+
+                this.informacionTiket(auxPrestamo.getLibro(), null);
+
                 switch (seleccion) {
                     case "1":
                         this.opcionPrestamo();
@@ -324,38 +389,42 @@ public class Menu {
                 }
                 break;
             case "2":
-                this.opcionPrestamo();
+                this.opcionDP_Libro();
                 break;
         }
     }
 
-    private void opcionDP_AudioVisual() {
-        String fechaDevolucion;
-        int codigo = this.verificarEnteros("Código del audiovisual: ", "Ingrese un código valido...");
-
-        for (Prestamo per : auxEstudiante.getRegistroPrestamos()) {
-            if (per.getLibro() == null) {
-                if (per.getMaVisual().getCodigo() == codigo) {
-                    auxPrestamo = per;
-                    break;
-                }
-            }
-        }
+    public void opcionDP_AudioVisual() {
+        fecha = new Date();
+        this.verificarMaterial("audiovisual");
 
         System.out.println("Datos del Material: ");
         auxPrestamo.getMaVisual().imprimirInfo();
 
-        System.out.print("Fecha Devolucion (23-03-2020): ");
+        System.out.println("");
         sc.nextLine();
-        fechaDevolucion = sc.nextLine();
-
-        this.funcionesVarias("  1. Guardar | 2. Reintentar");
+        this.funcionesVarias("  1. Aceptar | 2. Reintentar");
 
         switch (seleccion) {
             case "1":
-                auxPrestamo.setFechaDevolucion(fechaDevolucion);
-                System.out.println("Fecha: " + auxPrestamo.getFechaDevolucion());
-                this.funcionesVarias("  1. Guardar | 2. Reintentar");
+                System.out.println("Ingrese fecha de entrega: ");
+                do {
+                    bandera = true;
+                    fecha = this.llenarFecha();
+                    System.out.println("");
+                    sc.nextLine();
+                    this.funcionesVarias("  1. Aceptar | 2. Reintentar");
+                    if ("1".equals(seleccion)) {
+                        bandera = false;
+                    }
+
+                } while (bandera);
+
+                System.out.println("Holaaaaaaaaaa");
+                auxPrestamo.devolverMaterial(fecha);
+
+                this.informacionTiket(null, auxPrestamo.getMaVisual());
+
                 switch (seleccion) {
                     case "1":
                         this.opcionPrestamo();
@@ -366,7 +435,7 @@ public class Menu {
                 }
                 break;
             case "2":
-                this.opcionPrestamo();
+                this.opcionDP_AudioVisual();
                 break;
         }
     }
@@ -392,7 +461,6 @@ public class Menu {
     }
 
     private void verificarCarrera() {
-        boolean bandera = true;
         int aux;
 
         System.out.println("En qué carrera se encuentra el estudiante: ");
@@ -402,6 +470,7 @@ public class Menu {
         }
 
         do {
+            bandera = true;
             System.out.println(marco);
             System.out.print("    Selección: ");
             aux = sc.nextInt();
@@ -417,28 +486,171 @@ public class Menu {
         } while (bandera);
     }
 
-    private void verificarEstudiante() {
-        String cedula;
+    private String verificarCedula() {
+        String cedula = "";
 
-        System.out.println(marco);
-        System.out.print("Número de cédula del estudiante: ");
-        sc.nextLine();
+        if (auxint != 1) {
+            System.out.println(marco);
+            sc.nextLine();
+        }
+
+        System.out.print("Ingrese el número de cedula del estudiante: ");
         cedula = sc.nextLine();
 
         while (!auxEstudiante.verificarCedula(cedula)) {
+            System.out.println(marco);
             System.out.print("Ingrese un número valido: ");
             cedula = sc.nextLine();
         }
 
-        for (Estudiante estu : auxCarrera.getRegistroAlumnos()) {
-            if (estu.getCedula().equalsIgnoreCase(cedula)) {
-                auxEstudiante = estu;
+        auxint = 0;
+
+        return cedula;
+    }
+
+    private void verificarEstudiante() {
+        String cedula = this.verificarCedula();
+
+        do {
+            bandera = true;
+
+            for (Estudiante estu : auxCarrera.getRegistroAlumnos()) {
+                if (estu.getCedula().equalsIgnoreCase(cedula)) {
+                    auxEstudiante = estu;
+                    bandera = false;
+                }
+            }
+
+            if (bandera) {
+                System.out.println("Estudiante no encontrado...");
+                System.out.println("");
+                this.funcionesVarias("  1. Ingresar cédula de nuevo | 2. Nuevo Prestamo");
+
+                switch (seleccion) {
+                    case "1":
+                        auxint++;
+                        this.verificarEstudiante();
+                        break;
+                    case "2":
+                        this.opcionPrestamo();
+                        break;
+                }
+            }
+
+        } while (bandera);
+    }
+
+    private void verificarMaterial(String tipo) {
+        bandera = false;
+        auxPrestamo = new Prestamo();
+
+        int codigo = this.verificarEnteros(("Ingrese el código del " + tipo + ": "), "Ingrese un código valido...");
+        System.out.println(marco);
+
+        if (tipo.equals("libro")) {
+            for (Prestamo per : auxEstudiante.getRegistroPrestamos()) {
+
+                if (per.getMaVisual() == null) {
+                    if (per.getLibro().getCodigo() == codigo) {
+                        auxPrestamo = per;
+                        bandera = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (tipo.equals("audiovisual")) {
+            for (Prestamo per : auxEstudiante.getRegistroPrestamos()) {
+                if (per.getLibro() == null) {
+                    auxint++;
+                    if (per.getMaVisual().getCodigo() == codigo) {
+                        auxPrestamo = per;
+                        bandera = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!bandera) {
+            System.out.println("Material no encontrado...");
+            System.out.println("");
+            sc.nextLine();
+            this.funcionesVarias("  1. Reintentar código | 2. Opciones Prestamo");
+
+            switch (seleccion) {
+                case "1":
+                    this.verificarMaterial(tipo);
+                    break;
+                case "2":
+                    this.opcionPrestamo();
+                    break;
             }
         }
     }
 
+    //Metodo verificar fechas
+    public void modificarFecha() {
+        dia = fecha.getDate() + maxDias;
+        mes = fecha.getMonth();
+        anio = fecha.getYear();
+
+        do {
+            bandera = true;
+
+            if (dia > 30) {
+                dia -= diasMes;
+                mes++;
+                if (mes > 12) {
+                    mes = 1;
+                    anio++;
+                }
+            } else {
+                bandera = false;
+            }
+        } while (bandera);
+
+        fecha = new Date(anio, mes, dia);
+    }
+
+    private void establecerDatos(Libro libro, AudioVisual audioVisual) {
+        fecha = new Date();
+        fecha.setYear(fecha.getYear() + 1900);
+        fecha.setMonth(fecha.getMonth() + 1);
+        if (audioVisual == null) {
+            this.auxPrestamo = new Prestamo(fecha, libro);
+        } else {
+            this.auxPrestamo = new Prestamo(fecha, audioVisual);
+        }
+        this.modificarFecha();
+        this.auxPrestamo.setFechaDevolucion(fecha);
+        auxEstudiante.addPrestamo(auxPrestamo);
+    }
+
+    private void informacionTiket(Libro libro, AudioVisual audioVisual) {
+        System.out.println("             Guardado Exitosamente              ");
+        System.out.println(marco);
+
+        System.out.println("Información de entrega: ");
+        System.out.println("");
+        System.out.println("El estudiante: ");
+        auxEstudiante.mostrarInfo();
+        System.out.println("\nDatos de material prestado: ");
+        if (audioVisual == null) {
+            libro.imprimirInfo();
+        } else {
+            audioVisual.imprimirInfo();
+        }
+        System.out.println("\nFechas: ");
+        this.auxPrestamo.imprimirInfo();
+
+        System.out.println("");
+        this.funcionesVarias("  1. Opciones Prestamo | 2. Salir");
+    }
+
     private int verificarEnteros(String nota1, String nota2) {
-        boolean bandera = true;
+        bandera = true;
         int aux = 0;
 
         while (bandera) {
@@ -455,9 +667,55 @@ public class Menu {
         return aux;
     }
 
-    private void funcionesVarias(String cadenaExtra) {
-        boolean bandera;
+    private Date llenarFecha() {
+        do {
+            dia = this.verificarEnteros("Dia: ", "Dia no valido...");
 
+            if (dia > 0 && dia <= 30) {
+                bandera = false;
+            } else {
+                System.out.println("Dia no valido...");
+                bandera = true;
+            }
+        } while (bandera);
+
+        do {
+            mes = this.verificarEnteros("Mes: ", "Mes no valido...");
+
+            if (mes > 0 && mes <= 12) {
+                bandera = false;
+            } else {
+                System.out.println("Mes no valido...");
+                bandera = true;
+            }
+
+        } while (bandera);
+
+        do {
+            anio = this.verificarEnteros("Año: ", "Año no valido...");
+
+            if (anio > 2000) {
+                bandera = false;
+            } else {
+                System.out.println("Año no valido...");
+                bandera = true;
+            }
+
+        } while (bandera);
+
+        int diaRea = (auxPrestamo.getFechaPrestamo().getDate() + auxPrestamo.getFechaPrestamo().getMonth()
+                + auxPrestamo.getFechaPrestamo().getYear());
+
+        if ((dia + mes + anio) < diaRea) {
+            System.out.println("Fecha no valida... ");
+            this.llenarFecha();
+        }
+
+        Date nuevaFecha = new Date(anio, mes, dia);
+        return nuevaFecha;
+    }
+
+    private void funcionesVarias(String cadenaExtra) {
         do {
             bandera = false;
 

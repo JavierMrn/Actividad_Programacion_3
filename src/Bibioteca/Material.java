@@ -16,7 +16,6 @@ public class Material {
     }
     
     //Getters and Setters
-
     public String getTitulo() {
         return titulo;
     }

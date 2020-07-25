@@ -1,4 +1,4 @@
-package Bibioteca;
+package biblioteca;
 
 public class Libro extends Material {
 
@@ -23,6 +23,7 @@ public class Libro extends Material {
         System.out.println("Titulo del libro: " + titulo);
         System.out.println("Area del libro: " + area);
         System.out.println("Idioma: " + idioma);
+         System.out.println("Código del libro: " + codigo);
     }
 
     //Getters and Setters

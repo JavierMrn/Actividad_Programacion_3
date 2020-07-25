@@ -1,4 +1,4 @@
-package Bibioteca;
+package biblioteca;
 
 public class Material {
     protected String titulo;

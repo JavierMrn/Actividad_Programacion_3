@@ -1,4 +1,4 @@
-package Bibioteca;
+package biblioteca;
 
 import java.util.ArrayList;
 
@@ -58,6 +58,7 @@ public class Estudiante {
             cedulaCorrecta = false;
         }
         if (!cedulaCorrecta) {
+            System.out.println(Menu.marco);
             System.out.println("La cédula ingresada es incorrecta...");
         }
         return cedulaCorrecta;
@@ -68,26 +69,18 @@ public class Estudiante {
         registroPrestamos.add(a);
     }
 
-    public void addEntrega(Prestamo a, int index) {
-        registroEntregas.add(a);
-        registroPrestamos.remove(index);
-    }
-
     //Metodo que consulta los prestamos
     public boolean isResponsable() {
-        boolean responsable = true;
 
-        if (registroPrestamos.isEmpty()) {
+        if ((registroPrestamos.size() % 3 == 0) && !registroPrestamos.isEmpty()) {
+            for (int i = (registroPrestamos.size() - 1); i >= (registroPrestamos.size() - 3); i--) {
+                if (registroPrestamos.get(i).isAtrasado()) {
+                    return false;
+                }
+            }
             return false;
         }
-
-        for (int i = (registroPrestamos.size() - 1); i > (registroPrestamos.size() - 4); i++) {
-            if (registroPrestamos.get(i).isAtrasado()) {
-                responsable = false;
-            }
-        }
-
-        return responsable;
+        return true;
     }
 
     public void mostrarInfo() {

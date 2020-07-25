@@ -1,4 +1,4 @@
-package Bibioteca;
+package biblioteca;
 
 public class AudioVisual extends Material{
     private int duracion;
@@ -17,7 +17,8 @@ public class AudioVisual extends Material{
     //Metodos
     public void imprimirInfo() {
         System.out.println("Titulo del audivisual: " + titulo);
-        System.out.println("Duración: " + duracion + " min");
+        System.out.println("Duración del audiovisual: " + duracion + " min");
+        System.out.println("Código del audiovisual: " + codigo);
     }
     
     //Getters and Setters

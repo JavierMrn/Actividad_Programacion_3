@@ -9,7 +9,6 @@ public class Menu {
     private String seleccion = "";
     private Prestamo auxPrestamo = new Prestamo();
     private int auxint;
-    private int intOpcion;
     private Estudiante auxEstudiante = new Estudiante();
     private Carrera auxCarrera = new Carrera();
     private int diasMes = 30;
@@ -28,6 +27,7 @@ public class Menu {
     public Menu() {
     }
 
+    //Metodos
     public void activarMenu() {
         System.out.println("Seleccione una opción:");
         System.out.println("    1. Añadir nuevo estudiante.");
@@ -44,85 +44,74 @@ public class Menu {
 
         switch (seleccion) {
             case "1":
-                opcionNuevoEstudiante();
-                bandera = true;
+                this.opcionNuevoEstudiante();
                 break;
             case "2":
-        opcionNuevaCarrera();
-                bandera = true;
+                this.opcionNuevaCarrera();
                 break;
             case "3":
-                opcionPrestamo();
-                bandera = true;
+                this.opcionPrestamo();
                 break;
             case "4":
-                opcionReportesEstudiantes();
-                bandera = true;
+                this.opcionReportesEstudiantes();
                 break;
             case "5":
-                opcionSalir();
-                bandera = false;
+                this.opcionSalir();
                 break;
             default:
-                bandera = true;
                 System.out.println("          Seleccione una opción existente       ");
                 System.out.println(Menu.marco);
+                this.activarMenu();
                 break;
         }
     }
 
     //Metodo que registra un nuevo estudiante
     public void opcionNuevoEstudiante() {
+        auxEstudiante = new Estudiante();
+        String cedula = "", nombre, genero;
+
+        this.verificarCarrera(); //Verifica que exita la carrera
+
         do {
-            auxEstudiante = new Estudiante();
-            String cedula = "", nombre, genero;
+            //Verificar información del estudiante
+            cedula = this.verificarCedula();
+            auxEstudiante.setCedula(cedula);
+            nombre = this.verificarString("Ingrese el nombre del estudiante: ");
+            auxEstudiante.setNombre(nombre);
+            genero = this.verificarString("Ingrese el genero del estudiante: ");
+            auxEstudiante.setGenero(genero);
+            System.out.println("");
 
-            this.verificarCarrera(); //Verifica que exita la carrera
+            this.opcionesVarias("  1. Guardar | 2. Reintentar | 3. Salir", true);
+            bandera = seleccion.equals("2");
+            auxint = 1;
 
-            System.out.println(intOpcion);
-            System.out.println(seleccion);
-            if (seleccion.equals("2") || seleccion.equals("3")) {
-                seleccion = "";
-                break;
+            if (seleccion.equals("3")) {
+                this.activarMenu();
+                bandera = false;
             }
 
-            if (intOpcion == (carreras.size() + 2)) {
-                System.out.println(marco);
-                break;
-            }
-
-            do {
-                //Verificar información del estudiante
-                cedula = this.verificarCedula();
-                auxEstudiante.setCedula(cedula);
-                nombre = this.verificarString("Ingrese el nombre del estudiante: ");
-                auxEstudiante.setNombre(nombre);
-                genero = this.verificarString("Ingrese el genero del estudiante: ");
-                auxEstudiante.setGenero(genero);
-                System.out.println("");
-
-                this.opcionesVarias("  1. Guardar | 2. Reintentar | 3. Salir", true);
-                bandera = seleccion.equals("2");
-                auxint = 1;
-
-                if (seleccion.equals("3")) {
-                    bandera = false;
-                }
-
-            } while (bandera);
-
-            auxint = 0;
-
-            //Opciones para continuar....
-            if (seleccion.equals("1")) {
-                if (!auxCarrera.addStudent(auxEstudiante)) {
-                    System.out.println("             Guardado Exitosamente");
-                    System.out.println(marco);
-                }
-                this.opcionesVarias("  1. Nuevo Estudiante | 2. Salir", false);
-                bandera = seleccion.endsWith("1");
-            }
         } while (bandera);
+
+        auxint = 0;
+
+        //Opciones para continuar....
+        if (seleccion.equals("1")) {
+            if (!auxCarrera.addStudent(auxEstudiante)) {
+                System.out.println("             Guardado Exitosamente");
+                System.out.println(marco);
+            }
+            this.opcionesVarias("  1. Nuevo Estudiante | 2. Salir", false);
+            switch (seleccion) {
+                case "1":
+                    this.opcionNuevoEstudiante();
+                    break;
+                case "2":
+                    this.activarMenu();
+                    break;
+            }
+        }
     }
 
     //Metodo que registra una nueva carrera
@@ -130,130 +119,124 @@ public class Menu {
         String nombreCarrera, nombreDirector;
         int duracion;
 
+        //Verificar y llenar información de carrera
+        nombreCarrera = this.verificarString("Ingrese el nombre de la carrera: ");
+        nombreDirector = this.verificarString("Ingrese el nombre del director: ");
+
         do {
-            //Verificar y llenar información de carrera
-            nombreCarrera = this.verificarString("Ingrese el nombre de la carrera: ");
-            nombreDirector = this.verificarString("Ingrese el nombre del director: ");
-
-            do {
-                duracion = this.verificarEnteros("Ingrese el número de semestres: ", "Ingrese un número valido...");
-                if (duracion >= 3 && duracion <= 15) {
-                    bandera = false;
-                } else {
-                    System.out.println("Ingrese un número valido...");
-                    bandera = true;
-                }
-            } while (bandera);
-
-            System.out.println("");
-            sc.nextLine();
-            this.opcionesVarias("  1. Guardar | 2. Reintentar | 3. Salir", true);
-
-            switch (seleccion) {
-                case "1":
-                    Carrera carrera = new Carrera(nombreCarrera, duracion, nombreDirector);
-                    carreras.add(carrera);
-                    System.out.println("             Guardado Exitosamente              ");
-                    System.out.println(marco);
-                    this.opcionesVarias("  1. Nueva Carrera | 2. Salir", false);
-                    switch (seleccion) {
-                        case "1":
-                            bandera = true;
-                            break;
-                        case "2":
-                            bandera = false;
-                            seleccion = "";
-                            break;
-                    }
-                    break;
-                case "2":
-                    bandera = true;
-                    break;
-                case "3":
-                    bandera = false;
-                    break;
+            duracion = this.verificarEnteros("Ingrese el número de semestres: ", "Ingrese un número valido...");
+            if (duracion >= 3 && duracion <= 15) {
+                bandera = false;
+            } else {
+                System.out.println("Ingrese un número valido...");
+                bandera = true;
             }
         } while (bandera);
+
+        System.out.println("");
+        sc.nextLine();
+        this.opcionesVarias("  1. Guardar | 2. Reintentar | 3. Salir", true);
+
+        switch (seleccion) {
+            case "1":
+                Carrera carrera = new Carrera(nombreCarrera, duracion, nombreDirector);
+                carreras.add(carrera);
+                System.out.println("             Guardado Exitosamente              ");
+                System.out.println(marco);
+                this.opcionesVarias("  1. Nueva Carrera | 2. Salir", false);
+                switch (seleccion) {
+                    case "1":
+                        this.opcionNuevaCarrera();
+                        break;
+                    case "2":
+                        this.activarMenu();
+                        break;
+                }
+                break;
+            case "2":
+                this.opcionNuevaCarrera();
+                break;
+            case "3":
+                this.activarMenu();
+                break;
+        }
     }
 
     //Metodo que indica las opciones que tiene un prestamo
     public void opcionPrestamo() {
-        do {
-            this.opcionesVarias("  1. Registrar Nuevo Prestamo | 2. Entrega de Material \n\t\t      3. Salir", true);
 
-            if (seleccion.equals("3")) { //Llamar a la función que activa el menu
-                bandera = false;
-            }
+        this.opcionesVarias("  1. Registrar Nuevo Prestamo | 2. Entrega de Material \n\t\t      3. Salir", true);
 
-            //Verificar la carrera y al estudiante para poder continuar
-            this.verificarCarrera();
-            this.verificarEstudiante();
+        if (seleccion.equals("3")) { //Llamar a la función que activa el menu
+            this.activarMenu();
+        }
 
-            //Imprimir la información del estudiante si se ha podido encontrar
-            System.out.println(marco);
-            System.out.println("Información: ");
-            System.out.println("");
-            auxEstudiante.mostrarInfo();
-            System.out.println("");
+        //Verificar la carrera y al estudiante para poder continuar
+        this.verificarCarrera();
+        this.verificarEstudiante();
 
-            //Verificar las opciones para continuar
-            switch (seleccion) {
-                case "1": //Si la selección fue 1, llama a la función nuevoPrestamo
-                    this.opcionesVarias("  1. Aceptar | 2. Reintentar", false);
-                    switch (seleccion) {
-                        case "1":
-                            //Si en las últimas 3 entregas el estudiante no ha devuelto el material a tiempo no 
-                            //permite la realización de un nuevo prestamo
-                            if (!auxEstudiante.isResponsable()) {
-                                System.out.println("El estudiante tiene que pagar multa por atrasos, \n"
-                                        + "no se puede prestar mas materiales hasta que cancele.");
-                                System.out.println("");
-                                this.opcionesVarias("  1. Cancelar Pago y Continuar      | 2. Salir", false);
-                                bandera = !seleccion.equals("1");
-                            }
+        //Imprimir la información del estudiante si se ha podido encontrar
+        System.out.println(marco);
+        System.out.println("Información: ");
+        System.out.println("");
+        auxEstudiante.mostrarInfo();
+        System.out.println("");
 
-                            //Opciones disponibles para prestar
-                            System.out.println("Tipo de material a prestar: ");
+        //Verificar las opciones para continuar
+        switch (seleccion) {
+            case "1": //Si la selección fue 1, llama a la función nuevoPrestamo
+                this.opcionesVarias("  1. Aceptar | 2. Reintentar", false);
+                switch (seleccion) {
+                    case "1":
+                        //Si en las últimas 3 entregas el estudiante no ha devuelto el material a tiempo no 
+                        //permite la realización de un nuevo prestamo
+                        if (!auxEstudiante.isResponsable()) {
+                            System.out.println("El estudiante tiene que pagar multa por atrasos, \n"
+                                    + "no se puede prestar mas materiales hasta que cancele.");
                             System.out.println("");
-                            this.opcionesVarias("  1. Libro | 2. Audiovisual", false);
-                            this.opcionNuevoPrestamo(Integer.parseInt(seleccion));
-                            bandera = false;
-                            break;
-                        case "2": //Opción para reintentar
-                            bandera = true;
-                            break;
-                    }
-                    break;
-
-                case "2": //Si la selección fue 1, llama a la función nuevaEntrega
-                    this.opcionesVarias("  1. Aceptar | 2. Reintentar", false);
-                    switch (seleccion) {
-                        case "1":
-                            if (auxEstudiante.getRegistroPrestamos().isEmpty()) {
-                                System.out.println("No hay prestamos registrados...");
-                                System.out.println(marco);
-                                this.opcionesVarias("  1. Aceptar | 2. Salir", false);
-                                if (seleccion.equals("1")) {
-                                    bandera = true;
-                                } else {
-                                    bandera = false;
-                                }
+                            this.opcionesVarias("  1. Cancelar Pago y Continuar      | 2. Salir", false);
+                            if (!seleccion.equals("1")) {
+                                this.opcionPrestamo();
                             }
+                        }
 
-                            System.out.println("Tipo de material a entregar: ");
-                            System.out.println("");
-                            this.opcionesVarias("  1. Libro | 2. Audiovisual", false);
-                            this.opcionEntregaPrestamo(Integer.parseInt(seleccion));
-                            bandera = false;
-                            break;
-                        case "2":
-                            bandera = true;
-                            break;
-                    }
-            }
-        } while (bandera);
+                        //Opciones disponibles para prestar
+                        System.out.println("Tipo de material a prestar: ");
+                        System.out.println("");
+                        this.opcionesVarias("  1. Libro | 2. Audiovisual", false);
+                        this.opcionNuevoPrestamo(Integer.parseInt(seleccion));
+                        break;
+                    case "2": //Opción para reintentar
+                        this.opcionPrestamo();
+                        break;
+                }
+                break;
 
-        System.out.println("Nuevo Prestamo....");
+            case "2": //Si la selección fue 2, llama a la función nuevaEntrega
+                this.opcionesVarias("  1. Aceptar | 2. Reintentar", false);
+                switch (seleccion) {
+                    case "1":
+                        if (auxEstudiante.getRegistroPrestamos().isEmpty()) {
+                            System.out.println("No hay prestamos registrados...");
+                            System.out.println(marco);
+                            this.opcionesVarias("  1. Aceptar | 2. Salir", false);
+                            if (!seleccion.equals("1")) {
+                                this.activarMenu();
+                            } else {
+                                this.opcionPrestamo();
+                            }
+                        }
+
+                        System.out.println("Tipo de material a entregar: ");
+                        System.out.println("");
+                        this.opcionesVarias("  1. Libro | 2. Audiovisual", false);
+                        this.opcionEntregaPrestamo(Integer.parseInt(seleccion));
+                        break;
+                    case "2":
+                        this.opcionPrestamo();
+                        break;
+                }
+        }
     }
 
     //Metodo para llenar un nuevo prestamo
@@ -263,44 +246,117 @@ public class Menu {
         int duracion = 0;
         Libro libro = null;
         AudioVisual audioVisual = null;
+        if (selec == 1) {
+
+            System.out.println("Nuevo Prestamo - Libro");
+            System.out.println("");
+            codigo = this.verificarEnteros("Ingrese el código del libro (Ej. 123): ", "Ingrese un código valido...");
+
+            sc.nextLine();
+
+            //Verificar y llenar información del prestamo...
+            titulo = this.verificarString("Titulo del libro: ");
+            area = this.verificarString("Area del libro: ");
+            idioma = this.verificarString("Idioma del libro: ");
+
+        } else if (selec == 2) {
+
+            System.out.println("Nuevo Prestamo - Audiovisual");
+            System.out.println("");
+
+            titulo = this.verificarString("Título del audiovisual: ");
+            codigo = this.verificarEnteros("Código del audiovisual (Ej. 123): ", "Ingrese un código valido...");
+            duracion = this.verificarEnteros("Duración del audiovisual: ", "Ingrese una duración valida...");
+            sc.nextLine();
+        }
+
+        System.out.println("");
+        this.opcionesVarias("  1. Guardar | 2. Reintentar", false);
+
+        if (seleccion.equals("1")) {
+            if (selec == 1) {
+                libro = new Libro(codigo, titulo, area, idioma);
+            } else {
+                audioVisual = new AudioVisual(codigo, titulo, duracion);
+            }
+
+            this.establecerDatos(libro, audioVisual);
+            this.informacionTiket(libro, audioVisual);
+
+            System.out.println("");
+            this.opcionesVarias("  1. Opciones Prestamo | 2. Salir", false);
+
+            switch (seleccion) {
+                case "1":
+                    this.opcionPrestamo();
+                    break;
+                case "2":
+                    this.activarMenu();
+                    break;
+            }
+        } else {
+            this.opcionNuevoPrestamo(selec);
+        }
+    }
+
+    //Metodo que registra las entregas
+    private void opcionEntregaPrestamo(int selec) {
+        String tipo = (selec == 1) ? "libro" : "audiovisual";
 
         do {
+            this.verificarMaterial(tipo);
+
+            if (auxPrestamo.isEntregado()) {
+                System.out.println("Material entregado... ");
+                System.out.println(marco);
+            } else {
+                bandera = false;
+            }
+
+            System.out.println("Datos del Material: ");
+            System.out.println("");
+
             if (selec == 1) {
-
-                System.out.println("Nuevo Prestamo - Libro");
-                System.out.println("");
-                codigo = this.verificarEnteros("Ingrese el código del libro (Ej. 123): ", "Ingrese un código valido...");
-
-                sc.nextLine();
-
-                //Verificar y llenar información del prestamo...
-                titulo = this.verificarString("Titulo del libro: ");
-                area = this.verificarString("Area del libro: ");
-                idioma = this.verificarString("Idioma del libro: ");
-
-            } else if (selec == 2) {
-
-                System.out.println("Nuevo Prestamo - Audiovisual");
-                System.out.println("");
-
-                titulo = this.verificarString("Título del audiovisual: ");
-                codigo = this.verificarEnteros("Código del audiovisual (Ej. 123): ", "Ingrese un código valido...");
-                duracion = this.verificarEnteros("Duración del audiovisual: ", "Ingrese una duración valida...");
-                sc.nextLine();
+                auxPrestamo.getLibro().imprimirInfo();
+            } else {
+                auxPrestamo.getMaVisual().imprimirInfo();
             }
 
             System.out.println("");
-            this.opcionesVarias("  1. Guardar | 2. Reintentar", false);
+            sc.nextLine();
 
-            if (seleccion.equals("1")) {
-                if (selec == 1) {
-                    libro = new Libro(codigo, titulo, area, idioma);
-                } else {
-                    audioVisual = new AudioVisual(codigo, titulo, duracion);
+            if (auxPrestamo.isEntregado()) {
+                auxPrestamo.imprimirInfo();
+                System.out.println("");
+                this.opcionesVarias("  1. Reintentar Código | 2. Opciones Prestamo", false);
+                switch (seleccion) {
+                    case "1":
+                        bandera = true;
+                        break;
+                    case "2":
+                        bandera = false;
+                        this.opcionPrestamo();
+                        break;
                 }
+            }
+        } while (bandera);
 
-                this.establecerDatos(libro, audioVisual);
-                this.informacionTiket(libro, audioVisual);
+        this.opcionesVarias("  1. Aceptar | 2. Reintentar | 3. Salir", true);
+
+        switch (seleccion) {
+            case "1":
+                System.out.println("Ingrese fecha de entrega: ");
+
+                do {
+                    auxPrestamo.devolverMaterial(this.llenarFecha());
+                    System.out.println("");
+                    sc.nextLine();
+                    this.opcionesVarias("  1. Aceptar | 2. Reintentar Fecha", false);
+                    bandera = !seleccion.equals("1");
+
+                } while (bandera);
+
+                this.informacionTiket(auxPrestamo.getLibro(), auxPrestamo.getMaVisual());
 
                 System.out.println("");
                 this.opcionesVarias("  1. Opciones Prestamo | 2. Salir", false);
@@ -310,137 +366,61 @@ public class Menu {
                         this.opcionPrestamo();
                         break;
                     case "2":
+                        this.activarMenu();
                         break;
                 }
-                bandera = false;
-
-            } else {
-                bandera = true;
-            }
-        } while (bandera);
-    }
-
-    //Metodo que registra las entregas
-    private void opcionEntregaPrestamo(int selec) {
-        String tipo = (selec == 1) ? "libro" : "audiovisual";
-
-        do {
-            bandera = false;
-            do {
-                this.verificarMaterial(tipo);
-
-                if (auxPrestamo.isEntregado()) {
-                    System.out.println("Material entregado... ");
-                    System.out.println(marco);
-                } else {
-                    bandera = false;
-                }
-
-                System.out.println("Datos del Material: ");
-                System.out.println("");
-
-                if (selec == 1) {
-                    auxPrestamo.getLibro().imprimirInfo();
-                } else {
-                    auxPrestamo.getMaVisual().imprimirInfo();
-                }
-
-                System.out.println("");
-                sc.nextLine();
-
-                if (auxPrestamo.isEntregado()) {
-                    auxPrestamo.imprimirInfo();
-                    System.out.println("");
-                    this.opcionesVarias("  1. Reintentar Código | 2. Opciones Prestamo", false);
-                    switch (seleccion) {
-                        case "1":
-                            bandera = true;
-                            break;
-                        case "2":
-                            bandera = false;
-                            this.opcionPrestamo();
-                            break;
-                    }
-                }
-            } while (bandera);
-
-            this.opcionesVarias("  1. Aceptar | 2. Reintentar | 3. Salir", true);
-
-            switch (seleccion) {
-                case "1":
-                    System.out.println("Ingrese fecha de entrega: ");
-
-                    do {
-                        auxPrestamo.devolverMaterial(this.llenarFecha());
-                        System.out.println("");
-                        sc.nextLine();
-                        this.opcionesVarias("  1. Aceptar | 2. Reintentar Fecha", false);
-                        bandera = !seleccion.equals("1");
-
-                    } while (bandera);
-
-                    this.informacionTiket(auxPrestamo.getLibro(), auxPrestamo.getMaVisual());
-
-                    System.out.println("");
-                    this.opcionesVarias("  1. Opciones Prestamo | 2. Salir", false);
-
-                    switch (seleccion) {
-                        case "1":
-                            this.opcionPrestamo();
-                            bandera = false;
-                            break;
-                        case "2":
-                            bandera = false;
-                            break;
-                    }
-                    break;
-                case "2":
-                    bandera = true;
-                    break;
-                case "3":
-                    bandera = false;
-                    break;
-            }
-        } while (bandera);
+                break;
+            case "2":
+                this.opcionEntregaPrestamo(selec);
+                break;
+            case "3":
+                this.activarMenu();
+                break;
+        }
     }
 
     //Metodo que muestra la información de los estudiantes
     public void opcionReportesEstudiantes() {
-        do {
-            this.verificarCarrera();
-            this.verificarEstudiante();
+        this.verificarCarrera();
+        this.verificarEstudiante();
 
+        System.out.println(marco);
+        System.out.println("Prestamos registrados: ");
+        System.out.println(marco);
+
+        if (auxEstudiante.getRegistroPrestamos().isEmpty()) {
+            System.out.println("No se han registrado prestamos");
             System.out.println(marco);
-            System.out.println("Prestamos registrados: ");
-            System.out.println(marco);
-            for (Prestamo registroPrestamo : auxEstudiante.getRegistroPrestamos()) {
-                if (registroPrestamo.getMaVisual() == null) {
-                    registroPrestamo.getLibro().imprimirInfo();
-                    registroPrestamo.imprimirInfo();
-                } else {
-                    registroPrestamo.getMaVisual().imprimirInfo();
-                    registroPrestamo.imprimirInfo();
-                }
-                System.out.println("");
-            }
+        }
 
-            this.opcionesVarias("  1. Nueva Verificación | 2. Salir", false);
-
-            switch (seleccion) {
-                case "1":
-                    bandera = true;
-                    break;
-                case "2":
-                    bandera = false;
-                    break;
+        for (Prestamo registroPrestamo : auxEstudiante.getRegistroPrestamos()) {
+            if (registroPrestamo.getMaVisual() == null) {
+                registroPrestamo.getLibro().imprimirInfo();
+                registroPrestamo.imprimirInfo();
+            } else {
+                registroPrestamo.getMaVisual().imprimirInfo();
+                registroPrestamo.imprimirInfo();
             }
-        } while (bandera);
+            System.out.println("");
+        }
+
+        this.opcionesVarias("  1. Nueva Verificación | 2. Salir", false);
+
+        switch (seleccion) {
+            case "1":
+                this.opcionReportesEstudiantes();
+                break;
+            case "2":
+                this.activarMenu();
+                break;
+        }
     }
 
     //Metodo que da cierra a la aplicación
     public void opcionSalir() {
         System.out.println("      Gracias por utilizar nuestro sistema.     ");
         System.out.println(marco);
+        System.exit(0);
     }
 
     //Metodo que sirve para verificar una carrera
@@ -459,31 +439,34 @@ public class Menu {
 
             System.out.println("");
             System.out.println("    " + (carreras.size() + 1) + ". Nueva Carrera | " + (carreras.size() + 2) + ". Salir");
-
+            System.out.println(marco);
             do {
-                intOpcion = 0;
-                System.out.println(marco);
-                intOpcion = this.verificarEnteros("     Selección (Eje. 1,2...): ", marco + "\nOpción no validad...\n" + marco);
+                auxint = 0;
+                auxint = this.verificarEnteros("     Selección (Eje. 1,2...): ", marco + "\nOpción no validad...\n" + marco);
 
                 bandera = true;
 
-                if (intOpcion == (carreras.size() + 1)) {
+                if (auxint == (carreras.size() + 1)) {
                     sc.nextLine();
                     System.out.println(marco);
                     this.opcionNuevaCarrera();
                     break;
-                } else if (intOpcion == (carreras.size() + 2)) {
+                } else if (auxint == (carreras.size() + 2)) {
+                    sc.nextLine();
+                    System.out.println(marco);
+                    this.activarMenu();
                     break;
                 }
 
-                if ((intOpcion <= 0) || (intOpcion > (carreras.size() + 2))) {
+                if ((auxint <= 0) || (auxint > (carreras.size() + 2))) {
                     System.out.println(marco);
                     System.out.println("    Opción no existente");
+                    System.out.println(marco);
                     bandera = true;
-                } else if ((intOpcion >= 1) && (intOpcion <= carreras.size())) {
-                    intOpcion--;
-                    auxCarrera = carreras.get(intOpcion);
-
+                } else if ((auxint >= 1) && (auxint <= carreras.size())) {
+                    auxint--;
+                    auxCarrera = carreras.get(auxint);
+                    System.out.println(marco);
                     break;
                 }
             } while (bandera);
@@ -493,12 +476,9 @@ public class Menu {
     //Metodo para verificar el número de cédula
     private String verificarCedula() {
         String cedula = "";
-
         if (auxint != 1) {
-            System.out.println(marco);
             sc.nextLine();
         }
-
         System.out.print("Ingrese el número de cedula del estudiante: ");
         cedula = sc.nextLine();
 
